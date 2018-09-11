@@ -1,0 +1,193 @@
+{
+    "_configuration": {
+        "StartingLocation": "Home",
+        "StartingQuests": ["Master-Computer-Science"],
+        "StartingInventory": []
+    },
+
+    "_itemAttr": {
+        "raw-egg": {
+            "desc": "Some poor guy might be desperately looking for his/her Eastern egg. Oh, Ethan is his name.",
+            "questNew": "The-Egg-Hunter"
+        },
+        "I-card": {
+            "desc": "Where there's a card, there's a swiper."
+        },
+        "handout": {
+            "desc": "Quiz today: type any name of the data-structure we learnt this semester to finish this course. Easy, huh?"
+        }
+    },
+
+    "_quests": {
+        "Master-Computer-Science": {
+            "desc": "Take all the three core courses (CS225, CS233, CS241) and then celebrate at home."
+        },
+        "The-Egg-Hunter": {
+            "desc": "Return the raw-egg to the right hand."
+        },
+        "Data-Structures": {
+            "desc": "cs225 Dear Wade & Mattox!"
+        },
+        "System-Programming": {
+            "desc": "cs241 Threads, pthreads, pppppppp-threads!"
+        },
+        "Architecture": {
+            "desc": "cs233 Spim dat bot!"
+        }
+    },
+
+    "Home": {
+        "desc": "Home, sweet home. No more time for bed because it's a new semester! Before heading out, remember to 'look' around in the room for useful things to bring with you. Use 'quest' to check your goal.",
+        "title": "at home",
+        "dir": {
+            "north": "Cross"
+        },
+        "contents": [
+            "I-card"
+        ],
+        "events": {
+            "GamePoint": {
+                "hint-text": "'Celebrate' once you completed the three courses.",
+                "post-text": "You have finished this game. Congrats! You now master the essence of computer science!",
+                "require": ["233-A+", "225-A+", "241-A+"],
+                "match-words": ["celebrate"],
+                "questDone": "Master-Computer-Science",
+                "action": [
+                    "[:_configuration] #(assoc % :finished true)"
+                ]
+            }
+        }
+    },
+    "Cross": {
+        "desc": "You need to make the hardest decision on which course to take. Choose which building to go. There will be a course available in each of them. Some Easter eggs are on the ground.",
+        "title": "at the life's crossroad",
+        "dir": {
+            "north": "ECE",
+            "south": "Home",
+            "west": "DCL",
+            "east": "Siebel"
+        },
+        "contents": [
+            "raw-egg"
+        ]
+    },
+    "DCL": {
+        "desc": "Welcome to the Digital Computer Laboratory. Weird as it is, most of the doors are locked inside the building. Some other rooms have card swiper at the door.",
+        "title": "in the DCL building",
+        "dir": {
+            "east": "Cross"
+        },
+        "contents": [],
+        "events": {
+            "swipe": {
+                "hint-text": "There's a card swiper by the room 1320.",
+                "post-text": "The door unlocks! You can 'look' for the direction to enter the unlocked room.",
+                "require": ["I-card"],
+                "match-words": ["swipe I-card", "swipe", "use I-card"],
+                "questNew": "Architecture",
+                "action": [
+                    "[:the-map :DCL :dir] #(assoc % :north \"Rm1320\")",
+                    "[:the-map :Home :contents] #(conj % \"I-clicker\")",
+                    "[:the-map :DCL :events] #(dissoc % :swipe)"
+                ]
+            }
+        }
+    },
+    "Rm1320": {
+        "desc": "You meet Geoffrey here. Get ready for some architecture.",
+        "title": "in DCL Rm1320",
+        "dir": {
+            "south": "DCL"
+        },
+        "contents": [],
+        "events": {
+            "testIclicker": {
+                "hint-text": "First, you need to fetch your I-clicker at home, which you completely forgot it was there! 'Test' your I-clicker once you have it",
+                "post-text": "Great job! Your I-clicker is working well. Now answer Geoffrey's question based on what you've learned --. 'Look' for the question.",
+                "require": ["I-clicker"],
+                "match-words": ["test I-clicker", "test", "use I-clicker"],
+                "action": [
+                    "[:the-map :Rm1320 :events :iclickerQuestions] #(clojure.set/rename-keys % {:hint-text-hidden :hint-text})",
+                    "[:the-map :Rm1320 :events] #(dissoc % :testIclicker)"
+                ]
+            },
+            "iclickerQuestions": {
+                "hint-text-hidden": "Geoffrey: What is the main reason of the end of Moore's Law? A. CPU Price B. CPU Heat C. Lazy researchers. Click your answer.",
+                "post-text": "Your answer is correct! You understand the contents in CS233 well and you've acquired an A+.",
+                "require": ["I-clicker"],
+                "match-words": ["click B", "B", "use B", "CPU Heat", "CPU heat"],
+                "questDone": "Architecture",
+                "action": [
+                    "[:inventory] #(conj % \"233-A+\")",
+                    "[:the-map :Rm1320 :events] #(dissoc % :iclickerQuestions)"
+                ]
+            }
+        }
+    },
+    "Siebel": {
+        "desc": "You've entered the Siebel building. There are a lot people as well as a lot of rooms here. Try to 'talk' to someone asking which is the right room for cs241 here.",
+        "title": "in the Siebel Center",
+        "dir": {
+            "west": "Cross"
+        },
+        "contents": [],
+        "events": {
+            "ethan": {
+                "hint-text": "Everyone is enjoying chocolate except a worried-looking guy in the corner.",
+                "post-text": "Ethan: Thanks for finding my Eastern egg! BTW, if you're taking cs241, it's in Rm1304 to the south.",
+                "require": ["raw-egg"],
+                "match-words": ["ask", "Ethan", "talk", "use raw-egg"],
+                "questDone": "The-Egg-Hunter",
+                "questNew": "System-Programming",
+                "action": [
+                    "[:inventory] #(disj % (name :raw-egg))",
+                    "[:the-map :Siebel :dir] #(assoc % :south \"Rm1304\")",
+                    "[:the-map :Siebel :events] #(dissoc % :ethan)"
+                ]
+            }
+        }
+    },
+    "Rm1304": {
+        "desc": "Welcome to cs241. The creator of the game is lazy -- just sit down and 'learn' the course.",
+        "title": "in Siebel Rm1304",
+        "dir": {
+            "north": "Siebel"
+        },
+        "contents": [],
+        "events": {
+            "learn": {
+                "hint-text": "cs225 is a pre-requisite for cs241!",
+                "post-text": "That's it! You now get an A+ in cs241 for free!",
+                "match-words": ["learn"],
+                "require": ["225-A+"],
+                "questDone": "System-Programming",
+                "action": [
+                    "[:inventory] #(conj % \"241-A+\")",
+                    "[:the-map :Rm1304 :events] #(dissoc % :learn)"
+                ]
+            }
+        }
+    },
+    "ECE": {
+        "desc": "Good morning/afternoon! This is cs225. Here is the ECE building. Don't forget to grab a handout.",
+        "title": "in the ECE auditorium",
+        "dir": {
+            "south": "Cross"
+        },
+        "contents": ["handout"],
+        "events": {
+            "example": {
+                "hint-text": "'observe' the handout for further instruction.",
+                "post-text": "AWESOME! You now have an A+ in cs225!",
+                "require": ["handout"],
+                "match-words": ["tree", "graph", "list", "hash"],
+                "questDone": "Data-Structures",
+                "action": [
+                    "[:quests]  #(do % (:quests (adventure.core/AddQuest \"Data-Structures\" player))))",
+                    "[:inventory] #(conj % \"225-A+\")",
+                    "[:the-map :ECE :events] #(dissoc % :example)"
+                ]
+            }
+        }
+    }
+}
