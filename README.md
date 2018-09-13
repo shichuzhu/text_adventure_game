@@ -13,8 +13,7 @@ The main file you want to edit is `src/adventure/core.clj`.
 
 To run the program, use `lein run` from the command line.
 
-## Command lists
-
+You might need to install [lein](https://leiningen.org/) if you have not done so.
 
 ## Mechanism
 The adventure/adventure/core.clj file defines a framework for a generic game engine. All contents of the game is defined in the maps.json file. There are a few key concepts in the game framework, explained below.
